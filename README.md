@@ -1,10 +1,5 @@
 # Logger
 
-
-
-
-Swift Package 
-
 ## Description
 `Logger` is a library to format log messages with tracable details added to it. Log levels can also be adjusted to print the appropriate logs
 
