@@ -7,14 +7,22 @@ import XCTest
 @testable import Logger
 
 final class LoggerTests: XCTestCase {
+    let logger = Logger.shared
+    let testLogOutput = TestLogOutput()
+    
+    override func setUp() async throws {
+        logger.set(logOutput: testLogOutput)
+    }
+    
+    override class func tearDown() {
+        TestLogOutput().clearMessages()
+    }
+    
     /// Test Logger with debug level.
     /// All the log types will be printed
     func testDebugLoggerLevelConfiguration() {
-        let logger = Logger.shared
-        let testLogOutput = TestLogOutput()
-        logger.set(logOutput: testLogOutput)
         logger.log(withLogType: .debug, "Sample text")
-        
+
         if let lastMessage = testLogOutput.readLastMessage() {
             XCTAssertTrue(lastMessage.contains("Sample text"))
             XCTAssertTrue(lastMessage.contains("[Debug]"))
@@ -27,9 +35,6 @@ final class LoggerTests: XCTestCase {
     /// Test Logger with info level.
     /// Logs with info level and higer are printed, debug logs will not be printed
     func testInfoLoggerLevelConfiguration() {
-        let logger = Logger.shared
-        let testLogOutput = TestLogOutput()
-        logger.set(logOutput: testLogOutput)
         logger.change(logLevel: .info)
         
         // Debug message should not be logged
@@ -73,9 +78,6 @@ final class LoggerTests: XCTestCase {
     /// Test Logger with warn level.
     /// Logs with warn level and higer are printed
     func testWarnLoggerLevelChange() {
-        let logger = Logger.shared
-        let testLogOutput = TestLogOutput()
-        logger.set(logOutput: testLogOutput)
         logger.change(logLevel: .warn)
         
         // Debug message should not be logged
@@ -117,9 +119,6 @@ final class LoggerTests: XCTestCase {
     /// Test Logger with error level.
     /// Logs with erro level and higer are printed
     func testErrorLoggerLevelChange() {
-        let logger = Logger.shared
-        let testLogOutput = TestLogOutput()
-        logger.set(logOutput: testLogOutput)
         logger.change(logLevel: .error)
         
         // Debug message should not be logged
