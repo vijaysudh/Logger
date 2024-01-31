@@ -5,6 +5,7 @@
 
 import Foundation
 
+/// Log Type defines the type of log being printed
 public enum LogType: Int {
     case debug = 1
     case info
@@ -25,8 +26,15 @@ public enum LogType: Int {
     }
 }
 
+/// Protocol to direct the Log messages
+public protocol LogOutput {
+    func write(_ message: String)
+}
+
+/// Logger Class to print tracable logs
 public class Logger {
     private var logLevel: LogType = .debug
+    private var logOutput: LogOutput = ConsoleLogOutput()
     
     private init() {
         
@@ -34,10 +42,27 @@ public class Logger {
     
     public static let shared = Logger()
     
+    
+    /// Change the log level to be printed
+    /// - Parameter logLevel: Minimum level of log to be printed
     public func change(logLevel: LogType) {
         self.logLevel = logLevel
     }
     
+    
+    /// Set the log output. Defaults to console if not used
+    /// - Parameter logOutput: Concrete implementation where the logs should be written
+    func set(logOutput: LogOutput) {
+        self.logOutput = logOutput
+    }
+    
+    /// Processes the log message and adds additional tracability parameters
+    /// - Parameters:
+    ///   - logType: Log type for the message
+    ///   - items: Message content
+    ///   - file: File that the log is generated from
+    ///   - function: function that the log is generated fron
+    ///   - line: line number in the file
     public func log(withLogType logType: LogType,
                      _ items: Any...,
                      file: String = #file,
@@ -56,7 +81,16 @@ public class Logger {
         formatter.dateStyle = .short
         formatter.timeStyle = .long
         
-        print("\(formatter.string(from: date)) - \(filename).\(function): [\(line)] \(logType.logTypePrefix()) ", items)
+        let message = "\(formatter.string(from: date)) - \(filename).\(function): [\(line)] \(logType.logTypePrefix())  \(items)"
+        logOutput.write(message)
+    }
+}
+
+
+/// ConsoleLogOutput is the default implementation for the logs to be written to the console
+public class ConsoleLogOutput: LogOutput {
+    public func write(_ message: String) {
+        print(message)
     }
 }
 
